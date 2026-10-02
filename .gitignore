@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# C/C++
+*.o
+doubleVer
+build/
+
+# Lokalne
+
+demo.py/
+papers/
+
+data_out/
+plots/
+python/
+
