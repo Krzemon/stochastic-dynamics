@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-namespace doubleVer 
+namespace double_ver 
 {
     constexpr int N = 5;
     constexpr int OMEGA = 250150;
@@ -15,12 +15,12 @@ namespace doubleVer
     /**
      * @brief Odczytuje parametry a1, a3 i macierz s
      */
-    void readInputFile(const char* filename, double& a1, double& a3, double s[N][N]);
+    void read_input_file(const char* filename, double& a1, double& a3, double s[N][N]);
 
     /**
      * @brief Przelicza wagi przed ciężką pętlą
      */
-    std::vector<double> precomputeWeights(int omega, double ni);
+    std::vector<double> precompute_weights(int omega, double ni);
 
     /**
      * @brief Wykonuje główną pętlę obliczeniową wektorów y
@@ -39,7 +39,7 @@ namespace doubleVer
     /**
      * @brief Zapisuje wektory do pliku tekstowego "y_<caseName>_<powtAlfa>_od_<TS>_<a2/100>
      */
-    void writeResults(
+    void write_results(
         const char* caseName,
         const char* powtAlfa,
         double a2,
@@ -54,7 +54,7 @@ namespace doubleVer
     /**
      * @brief Wczytuje zapisane wyniki z pliku tekstowego do wektorów
      */
-    void readResults_out(
+    void read_results_out(
         const char* filename,
         std::vector<double>& y0,
         std::vector<double>& y1,
@@ -66,22 +66,6 @@ namespace doubleVer
     /**
      * @brief Wykonuje kod "doubleVer"
      */
-    void runCalculation(int argc, char* argv[]);
-    
-    /**
-     * @brief Obsługuje tryb odczytu z pliku
-     */
-    // void runRead(int argc, char* argv[]);
+    void run_calculation(int argc, char* argv[]);
 
 } 
-
-// namespace analysis 
-// {
-//     void analyze(
-//         const std::vector<double>& y0,
-//         const std::vector<double>& y1,
-//         const std::vector<double>& y2,
-//         const std::vector<double>& y3,
-//         const std::vector<double>& y4
-//     );
-// }

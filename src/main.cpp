@@ -14,11 +14,11 @@ int main(int argc, char* argv[])
 
     try {
         if (std::strcmp(argv[1], "obliczenie") == 0)
-            doubleVer::runCalculation(argc, argv);
+            double_ver::run_calculation(argc, argv);
         // else if (std::strcmp(argv[1], "odczyt") == 0)
         //     doubleVer::runRead(argc, argv);
         else
-            throw std::invalid_argument("Nieznany tryb: " +std::string(argv[1]));
+            throw std::invalid_argument("Nieznany tryb: " + std::string(argv[1]));
     } catch (const std::exception& e) {
         std::cerr << "Blad: " << e.what() << '\n';
         return 1;

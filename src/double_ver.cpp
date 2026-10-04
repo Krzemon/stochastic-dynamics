@@ -1,18 +1,18 @@
-#include "functions.hpp"
+#include "double_ver.hpp"
 #include "config.hpp"
 
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
-#include <iostream>
+// #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
 namespace doubleVer 
 {
-    void readInputFile(const char* filename,double& a1, double& a3, double s[N][N]) 
+    void read_input_file(const char* filename,double& a1, double& a3, double s[N][N]) 
     {
         std::ifstream input(filename);
 
@@ -31,7 +31,7 @@ namespace doubleVer
             throw std::runtime_error("Błąd podczas odczytu danych z pliku: " + std::string(filename));
     }
 
-    std::vector<double> precomputeWeights(int omega, double ni) 
+    std::vector<double> precompute_weights(int omega, double ni) 
     {
         std::vector<double> weights(omega + 1);
         weights[0] = 1.0;
@@ -132,7 +132,7 @@ namespace doubleVer
         }
     }
 
-    void writeResults(
+    void write_results(
         const char* caseName,
         const char* powtAlfa,
         double a2,
@@ -150,11 +150,11 @@ namespace doubleVer
         auto file = prepareDataFile(filename.str());
         file.out << std::fixed << std::setprecision(10);
 
-        for (int i = TS; i <= OMEGA; ++i) 
+        for (int i=TS; i<=OMEGA; ++i) 
             file.out << y0[i] << ' ' << y1[i] << ' ' << y2[i] << ' ' << y3[i] << ' ' << y4[i] << '\n';
     }
 
-    void readResults(
+    void read_results(
         const char* filename,
         std::vector<double>& y0,
         std::vector<double>& y1,
@@ -183,7 +183,7 @@ namespace doubleVer
             throw std::runtime_error("Błąd podczas odczytu pliku wynikowego: " + std::string(filename));
     }
 
-    void runCalculation(int argc, char* argv[]) 
+    void run_calculation(int argc, char* argv[]) 
     {
         if (argc < 6)
             throw std::invalid_argument("Użycie:\n   program obliczenie case powt_alfa a2 plik_wejsciowy");
@@ -192,60 +192,16 @@ namespace doubleVer
         double s[N][N]{};
         std::vector<double> y0, y1, y2, y3, y4;
 
-        readInputFile(argv[5],a1,a3,s);
+        read_input_file(argv[5],a1,a3,s);
 
         const int a2i = std::atoi(argv[4]);
         const double a2 = static_cast<double>(a2i) / 100.0;
 
-        const std::vector<double> weights = precomputeWeights(OMEGA, NI);
+        const std::vector<double> weights = precompute_weights(OMEGA, NI);
 
         calculate(s,a1,a2,a3,weights,y0,y1,y2,y3,y4);
-        writeResults(argv[2],argv[3],a2,y0,y1,y2,y3,y4);
+        write_results(argv[2],argv[3],a2,y0,y1,y2,y3,y4);
     }
-
-    // void runRead(
-    //     int argc,
-    //     char* argv[]
-    // ) {
-    //     if (argc < 3) {
-    //         throw std::invalid_argument(
-    //             "Użycie:\n"
-    //             "  program odczyt plik_wynikowy"
-    //         );
-    //     }
-
-    //     std::vector<double> y0;
-    //     std::vector<double> y1;
-    //     std::vector<double> y2;
-    //     std::vector<double> y3;
-    //     std::vector<double> y4;
-
-    //     readResults(argv[2],y0,y1,y2,y3,y4);
-
-    //     std::cout << "Odczytano " << y0.size() << " punktow.\n";
-
-    //     analysis::analyze(y0,y1,y2,y3,y4);
-    // }
 
 } 
 
-// namespace analysis 
-// {
-//     void analyze(
-//         const std::vector<double>& y0,
-//         const std::vector<double>& y1,
-//         const std::vector<double>& y2,
-//         const std::vector<double>& y3,
-//         const std::vector<double>& y4
-//     ) {
-//         (void)y0;
-//         (void)y1;
-//         (void)y2;
-//         (void)y3;
-//         (void)y4;
-
-//         std::cout
-//             << "Modul analysis jest przygotowany.\n";
-//     }
-
-// }
