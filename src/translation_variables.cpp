@@ -1,33 +1,18 @@
 #include "translation_variables.hpp"
 #include "math_utils.hpp"
 
+#include <iostream>
 #include <cmath>
 #include <fstream>
+#include <string>
 #include <iomanip>
 #include <stdexcept>
 
 namespace translation_variables 
 {
-    // void analyze(
-    //     const std::vector<double>& y0,
-    //     const std::vector<double>& y1,
-    //     const std::vector<double>& y2,
-    //     const std::vector<double>& y3,
-    //     const std::vector<double>& y4) 
-    // {
-    //     (void)y0;
-    //     (void)y1;
-    //     (void)y2;
-    //     (void)y3;
-    //     (void)y4;
-    // }
-
-
-
     double calc_K(const std::vector<double>& phi)
     {
         const size_t N = phi.size();
-
         std::vector<double> K_values;
 
         // element 0 jest dla uwydatnienia tworzenia wektora sum
@@ -70,8 +55,8 @@ namespace translation_variables
             K_values.push_back(Kc);
         }
 
-            return math_utils::median(K_values);
-        }
+        return math_utils::median(K_values);
+    }
 
 
     void construct_PQ(const std::vector<double>& phi,
@@ -88,7 +73,38 @@ namespace translation_variables
         }
     }
     
+    std::vector<double> read_phi_from_file(const std::string& filename)
+    {
+        std::ifstream input_file(filename);
+
+        if (!input_file.is_open())
+            throw std::runtime_error("Nie można otworzyć pliku: " + filename);
+
+        std::vector<double> phi;
+        std::string line;
+
+        while (std::getline(input_file, line))
+        {
+            std::istringstream iss(line);
+            double value;
+                
+            if (iss >> value)
+                phi.push_back(value);
+        }
+        return phi;
+    }
 
 
+    void run_calculation(int argc, char* argv[])
+    {
+        // if (argc < 4)
+        //     throw std::invalid_argument("Użycie:\n   program \"analiza\" <plik_wejściowy> <plik_wyjściowy_Mn>");
+        
+        const std::vector<double> phi = read_phi_from_file();
 
+        double K_val = calc_K(phi);
+
+        std::cout << "Wartosc K dla chaosu wynosi: " << K_val << std::endl;
+
+    }
 }

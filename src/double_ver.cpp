@@ -5,12 +5,11 @@
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
-// #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
-namespace doubleVer 
+namespace double_ver 
 {
     void read_input_file(const char* filename,double& a1, double& a3, double s[N][N]) 
     {
@@ -186,7 +185,7 @@ namespace doubleVer
     void run_calculation(int argc, char* argv[]) 
     {
         if (argc < 6)
-            throw std::invalid_argument("Użycie:\n   program obliczenie case powt_alfa a2 plik_wejsciowy");
+            throw std::invalid_argument("Użycie:\n   program \"obliczenie\" <case> <powt_alfa> <a2> <input_file>");
 
         double a1, a3;
         double s[N][N]{};
