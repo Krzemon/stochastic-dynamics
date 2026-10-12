@@ -182,6 +182,28 @@ namespace double_ver
             throw std::runtime_error("Błąd podczas odczytu pliku wynikowego: " + std::string(filename));
     }
 
+    void write_binary(
+        const std::string& filename,
+        const std::vector<double>& data)
+    {
+        std::ofstream file(filename, std::ios::binary);
+
+        if (!file)
+            throw std::runtime_error("Cannot open file for writing: " + filename);
+
+        std::size_t size = data.size();
+
+        file.write(
+            reinterpret_cast<const char*>(&size),
+            sizeof(size)
+        );
+
+        file.write(
+            reinterpret_cast<const char*>(data.data()),
+            size * sizeof(double)
+        );
+    }
+
     void run_calculation(int argc, char* argv[]) 
     {
         if (argc < 6)

@@ -16,8 +16,9 @@ namespace translation_variables
         std::vector<double> K_values;
 
         // element 0 jest dla uwydatnienia tworzenia wektora sum
-        std::vector<double> p(N+1, .0); // p[0]=0
-        std::vector<double> q(N+1, .0); // q[0]=0
+        std::vector<double> p(N+1);
+        std::vector<double> q(N+1);
+        p[0] = .0; q[0] = .0;
 
         // c przemiatane w zakresie (0, 2pi)
         std::vector<double> frequencies;
@@ -26,7 +27,7 @@ namespace translation_variables
 
         for (const double c : frequencies)
         {
-            construct_PQ(phi, p, q, c, N);
+            make_PQ(phi, p, q, c, N);
 
             std::vector<double> M_values;
             std::vector<double> n_values = math_utils::arange<double>(1, N);
@@ -59,13 +60,11 @@ namespace translation_variables
     }
 
 
-    void construct_PQ(const std::vector<double>& phi,
-                            std::vector<double>& p,
-                            std::vector<double>& q,
-                      const double c, const size_t N)
+    void make_PQ(const std::vector<double>& phi,
+                       std::vector<double>& p,
+                       std::vector<double>& q,
+                 const double c, const size_t N)
     {
-        p[0] = .0; q[0] = .0;
-
         for (size_t n = 1; n <= N; ++n)
         {
             p[n] = p[n - 1] + phi[n - 1] * std::cos(c * n);
@@ -73,6 +72,32 @@ namespace translation_variables
         }
     }
     
+    auto make_angle_distance(const std::vector<double>& phi) -> std::pair<std::vector<double>, std::vector<double>>
+    {
+        const size_t N = phi.size();
+        // element 0 jest dla uwydatnienia tworzenia wektora sum
+        std::vector<double> p(N+1);
+        std::vector<double> q(N+1);
+        p[0] = .0; q[0] = .0;
+
+        std::vector<double> theta(N); // theta[0] powstaje z [0] i [1] 
+        std::vector<double> d(N);     // d[0] powstaje z [0] i [1] 
+
+        double c = M_PI/4;
+        make_PQ(phi, p, q, c, N);
+
+        for (int i = 0; i < N; ++i)
+        {
+            double dp = p[i+1] - p[i];
+            double dq = q[i+1] - q[i];
+
+            theta[i] = math_utils::angle(dq, dp);
+            d[i] = std::sqrt(dp*dp + dq*dq);
+        }
+
+        return {theta, d};
+    }
+
     std::vector<double> read_phi_from_file(const std::string& filename)
     {
         std::ifstream input_file(filename);
