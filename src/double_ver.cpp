@@ -146,11 +146,11 @@ namespace double_ver
         filename << "y_" << caseName << "_" << powtAlfa << "_od_" << TS << "_" 
                     << std::fixed<< std::setprecision(5) << a2 << type;
 
-        auto file = prepareDataFile(filename.str());
-        file.out << std::fixed << std::setprecision(10);
+        std::ofstream file = prepare_data_file(filename.str());
+        file << std::fixed << std::setprecision(10);
 
         for (int i=TS; i<=OMEGA; ++i) 
-            file.out << y0[i] << ' ' << y1[i] << ' ' << y2[i] << ' ' << y3[i] << ' ' << y4[i] << '\n';
+            file << y0[i] << ' ' << y1[i] << ' ' << y2[i] << ' ' << y3[i] << ' ' << y4[i] << '\n';
     }
 
     void read_results(
@@ -180,28 +180,6 @@ namespace double_ver
 
         if (!input.eof())
             throw std::runtime_error("Błąd podczas odczytu pliku wynikowego: " + std::string(filename));
-    }
-
-    void write_binary(
-        const std::string& filename,
-        const std::vector<double>& data)
-    {
-        std::ofstream file(filename, std::ios::binary);
-
-        if (!file)
-            throw std::runtime_error("Cannot open file for writing: " + filename);
-
-        std::size_t size = data.size();
-
-        file.write(
-            reinterpret_cast<const char*>(&size),
-            sizeof(size)
-        );
-
-        file.write(
-            reinterpret_cast<const char*>(data.data()),
-            size * sizeof(double)
-        );
     }
 
     void run_calculation(int argc, char* argv[]) 

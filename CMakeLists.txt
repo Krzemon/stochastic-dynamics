@@ -13,7 +13,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -O3 -march=native")
 # --- Katalogi projektu ---
 set(SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
-set(DATA_DIR ${PROJECT_SOURCE_DIR}/data_out)
+set(DATA_DIR ${PROJECT_SOURCE_DIR}/data)
 set(PLOTS_DIR ${PROJECT_SOURCE_DIR}/plots)
 set(PYTHON_DIR ${PROJECT_SOURCE_DIR}/python)
 
