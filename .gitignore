@@ -9,13 +9,12 @@ __pycache__/
 *.o
 doubleVer
 build/
+extern_C/
 
 # Lokalne
 
-demo.py/
+0=demo/
 papers/
 
 data_out/
 plots/
-python/
-
