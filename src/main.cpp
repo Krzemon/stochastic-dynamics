@@ -14,10 +14,13 @@ int main(int argc, char* argv[])
     }
 
     try {
+        // --- obliczenie prowadzimy pierwotnym kodem doubleVer.c ---
         if (std::strcmp(argv[1], "obliczenie") == 0)
             double_ver::run_calculation(argc, argv);
         else if (std::strcmp(argv[1], "analiza") == 0)
             translation_variables::run_calculation(argc, argv);
+        // else if (false)
+        //     void;
         else
             throw std::invalid_argument("Nieznany tryb: " + std::string(argv[1]));
     } catch (const std::exception& e) {
