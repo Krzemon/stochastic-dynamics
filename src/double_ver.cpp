@@ -146,7 +146,7 @@ namespace double_ver
         filename << "y_" << caseName << "_" << powtAlfa << "_od_" << TS << "_" 
                     << std::fixed<< std::setprecision(5) << a2 << type;
 
-        std::ofstream file = prepare_data_file(filename.str());
+        std::ofstream file = prepare_data_file(filename.str(), "data_out");
         file << std::fixed << std::setprecision(10);
 
         for (int i=TS; i<=OMEGA; ++i) 

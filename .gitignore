@@ -17,4 +17,9 @@ extern_C/
 papers/
 
 data_out/
+data/
+
 plots/
+plots_out/
+
+rules.md

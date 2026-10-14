@@ -1,5 +1,6 @@
 #include "translation_variables.hpp"
 #include "math_utils.hpp"
+#include "config.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -7,52 +8,47 @@
 #include <string>
 #include <iomanip>
 #include <stdexcept>
+#include <sstream>
 
 namespace translation_variables 
 {
     double calc_K(const std::vector<double>& phi)
     {
-        const size_t N = phi.size();
+        usize N = phi.size();
         std::vector<double> K_values;
 
-        // element 0 jest dla uwydatnienia tworzenia wektora sum
         std::vector<double> p(N+1);
         std::vector<double> q(N+1);
-        p[0] = .0; q[0] = .0;
+        p[0] = 0.0; q[0] = 0.0;
 
-        // c przemiatane w zakresie (0, 2pi)
         std::vector<double> frequencies;
         for (double c = 0.01; c < 2*M_PI; c += 0.02)
             frequencies.push_back(c);
 
-        for (const double c : frequencies)
+        for (double c : frequencies)
         {
             make_PQ(phi, p, q, c, N);
 
             std::vector<double> M_values;
             std::vector<double> n_values = math_utils::arange<double>(1, N);
 
-            // pętla po opóźnieniach n
-            for (size_t n = 1; n < N; ++n)
+            for (usize n = 1; n < N; ++n)
             {
-                double M_sum = .0;
-                for (size_t j = 1; j+n <= N; ++j) // j od 1, bo to początek szeregu phi
+                double M_sum = 0.0;
+                for (usize j = 1; j+n <= N; ++j)
                 {
                     double dp = p[j + n] - p[j];
                     double dq = q[j + n] - q[j];
                     M_sum += dp*dp + dq*dq;
                 }
 
-                // liczba użytych składników (żeby estymator był nieobciążony, ale nie wiem czy to ma sens w tym przypadku)
-                size_t count = N - n + 1; // bo we wzorze N -> inf
+                usize count = N - n + 1;
                 double Mn = M_sum / count;
 
                 M_values.push_back(Mn);
             }
 
-            // K(c) = corr(M(n), n)
             double Kc = math_utils::calc_pearson(M_values, n_values);
-
             K_values.push_back(Kc);
         }
 
@@ -61,32 +57,32 @@ namespace translation_variables
 
 
     void make_PQ(const std::vector<double>& phi,
-                       std::vector<double>& p,
-                       std::vector<double>& q,
-                 const double c, const size_t N)
+                 std::vector<double>& p,
+                 std::vector<double>& q,
+                 double c, usize N)
     {
-        for (size_t n = 1; n <= N; ++n)
+        for (usize n = 1; n <= N; ++n)
         {
             p[n] = p[n - 1] + phi[n - 1] * std::cos(c * n);
             q[n] = q[n - 1] + phi[n - 1] * std::sin(c * n);
         }
     }
+
     
-    auto make_angle_distance(const std::vector<double>& phi) -> std::pair<std::vector<double>, std::vector<double>>
+    auto make_angle_distance(const std::vector<double>& phi, double c) 
+        -> std::pair<std::vector<double>, std::vector<double>>
     {
-        const size_t N = phi.size();
-        // element 0 jest dla uwydatnienia tworzenia wektora sum
+        usize N = phi.size();
         std::vector<double> p(N+1);
         std::vector<double> q(N+1);
-        p[0] = .0; q[0] = .0;
+        p[0] = 0.0; q[0] = 0.0;
 
-        std::vector<double> theta(N); // theta[0] powstaje z [0] i [1] 
-        std::vector<double> d(N);     // d[0] powstaje z [0] i [1] 
+        std::vector<double> theta(N);
+        std::vector<double> d(N);
 
-        double c = M_PI/4;
         make_PQ(phi, p, q, c, N);
 
-        for (int i = 0; i < N; ++i)
+        for (usize i = 0; i < N; ++i)
         {
             double dp = p[i+1] - p[i];
             double dq = q[i+1] - q[i];
@@ -98,6 +94,7 @@ namespace translation_variables
         return {theta, d};
     }
 
+
     std::vector<double> read_phi_from_file(const std::string& filename)
     {
         std::ifstream input_file(filename);
@@ -105,31 +102,92 @@ namespace translation_variables
         if (!input_file.is_open())
             throw std::runtime_error("Nie można otworzyć pliku: " + filename);
 
-        std::vector<double> phi;
+        std::vector<double> y0;
         std::string line;
 
         while (std::getline(input_file, line))
         {
             std::istringstream iss(line);
-            double value;
+            double v0, v1, v2, v3, v4;
                 
-            if (iss >> value)
-                phi.push_back(value);
+            if (iss >> v0 >> v1 >> v2 >> v3 >> v4)
+                y0.push_back(v0);
         }
-        return phi;
+        
+        return y0;
+    }
+
+
+    void write_trajectory_data(const std::string& input_filepath, usize n_last, double c)
+    {
+        prepare_directories(false, false);
+
+        std::cout << "\nParametry: n_last = " << n_last << ", c = " << c << std::endl;
+        std::cout << "Wczytywanie z: " << input_filepath << std::endl;
+
+        std::vector<double> phi = read_phi_from_file(input_filepath);
+        std::cout << "Wczytano " << phi.size() << " wartości phi (y0)" << std::endl;
+
+        // Wyciągnij wartość s z nazwy pliku
+        // Format: y_266_11_od_0_XX.XXXXX.out -> s = XX.XX
+        std::string filename = input_filepath.substr(input_filepath.find_last_of("/\\") + 1);
+        
+        std::size_t pos = filename.find("_od_0_");
+        if (pos == std::string::npos)
+            throw std::runtime_error("Nie można wyciągnąć wartości s z nazwy pliku");
+        
+        std::string s_str = filename.substr(pos + 6, 5);
+        double s_value = std::stod(s_str);
+        
+        std::cout << "Wykryta wartość s = " << s_value << std::endl;
+
+        auto [theta, d] = make_angle_distance(phi, c);
+
+        usize N = phi.size();
+        std::vector<double> p(N + 1);
+        std::vector<double> q(N + 1);
+        p[0] = 0.0; q[0] = 0.0;
+        
+        make_PQ(phi, p, q, c, N);
+
+        usize total = theta.size();
+        usize start_idx = (n_last > 0 && total > n_last) ? (total - n_last) : 0;
+        usize count = total - start_idx;
+
+        int s_int = static_cast<int>(s_value * 100);
+        
+        std::ostringstream filename_stream;
+        filename_stream << s_int << "/alpha_seq_s_" << std::fixed << std::setprecision(2) << s_value << ".dat";
+        
+        auto file = prepare_data_file(filename_stream.str());
+
+        file << "# p q theta d\n";
+        
+        for (usize i = start_idx; i < total; ++i)
+        {
+            double angle = theta[i];
+            double dist = d[i];
+            
+            if (std::abs(angle) < 1e-10 && std::abs(dist) < 1e-10)
+                continue;
+                
+            file << std::setprecision(10) << std::fixed
+                 << p[i] << " "
+                 << q[i] << " "
+                 << angle << " "
+                 << dist << "\n";
+        }
+
+        std::cout << "Zapisano " << count << " punktów do data/" << filename_stream.str() << std::endl;
     }
 
 
     void run_calculation(int argc, char* argv[])
     {
-        // if (argc < 4)
-        //     throw std::invalid_argument("Użycie:\n   program \"analiza\" <plik_wejściowy> <plik_wyjściowy_Mn>");
-        
-        const std::vector<double> phi = read_phi_from_file();
+        std::vector<double> phi = read_phi_from_file();
 
         double K_val = calc_K(phi);
 
-        std::cout << "Wartosc K dla chaosu wynosi: " << K_val << std::endl;
-
+        std::cout << "Wartosc K wynosi: " << K_val << std::endl;
     }
 }

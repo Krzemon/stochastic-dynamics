@@ -17,15 +17,6 @@ set(DATA_DIR ${PROJECT_SOURCE_DIR}/data)
 set(PLOTS_DIR ${PROJECT_SOURCE_DIR}/plots)
 set(PYTHON_DIR ${PROJECT_SOURCE_DIR}/python)
 
-# --- Pliki wynikowe danych ---
-# set(DATA_FILE_ZAD1 ${DATA_DIR}/zad_1.dat)
-
-# --- Pliki wynikowe wykresow ---
-# set(PLOT_FILE_ZAD1 ${PLOTS_DIR}/zad_1_grid.png)
-
-# --- Skrypty do wykresow ---
-# set(PLOT_SCRIPT_ZAD1 ${PYTHON_DIR}/plot_zad1_grid.py)
-
 # --- Zrodla ---
 file(GLOB SOURCES "${SRC_DIR}/*.cpp")
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -37,10 +28,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE gsl gslcblas m)
 # --- Definicje kompilacji ---
 target_compile_definitions(${PROJECT_NAME} PRIVATE PROJECT_ROOT_DIR="${PROJECT_SOURCE_DIR}")
 
-# add_custom_command(
-#     TARGET ${PROJECT_NAME}
-#     POST_BUILD
-#     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-#     COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
-#     # COMMAND python3 ${PLOT_SCRIPT_ZAD1} ${DATA_FILE_ZAD1} ${PLOT_FILE_ZAD1} "title"
-# )
+# --- Custom target: run_plot (ogólny - uruchamia domyślny tryb) ---
+add_custom_target(run_plot
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
+    COMMAND python3 ${PYTHON_DIR}/plot_sequence_analysis.py
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    DEPENDS ${PROJECT_NAME}
+    COMMENT "Uruchamianie domyślnego trybu i generowanie wykresów..."
+)
