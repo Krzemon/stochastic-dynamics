@@ -122,14 +122,8 @@ namespace translation_variables
     {
         prepare_directories(false, false);
 
-        std::cout << "\nParametry: n_last = " << n_last << ", c = " << c << std::endl;
-        std::cout << "Wczytywanie z: " << input_filepath << std::endl;
-
         std::vector<double> phi = read_phi_from_file(input_filepath);
-        std::cout << "Wczytano " << phi.size() << " wartości phi (y0)" << std::endl;
 
-        // Wyciągnij wartość s z nazwy pliku
-        // Format: y_266_11_od_0_XX.XXXXX.out -> s = XX.XX
         std::string filename = input_filepath.substr(input_filepath.find_last_of("/\\") + 1);
         
         std::size_t pos = filename.find("_od_0_");
@@ -139,8 +133,6 @@ namespace translation_variables
         std::string s_str = filename.substr(pos + 6, 5);
         double s_value = std::stod(s_str);
         
-        std::cout << "Wykryta wartość s = " << s_value << std::endl;
-
         auto [theta, d] = make_angle_distance(phi, c);
 
         usize N = phi.size();
@@ -178,7 +170,7 @@ namespace translation_variables
                  << dist << "\n";
         }
 
-        std::cout << "Zapisano " << count << " punktów do data/" << filename_stream.str() << std::endl;
+        std::cout << "Zapisano: data/" << filename_stream.str() << std::endl;
     }
 
 

@@ -127,7 +127,7 @@ def plot_single_block(theta_deg, runs, block_name, block_run_idx, block_len, con
     ax.set_xlim(plot_start - 1, plot_end + 1)
     ax.set_ylim(-10, 370)
     ax.set_xlabel(r'Indeks kąta')
-    ax.set_ylabel(r'Kąt $\theta$ [°]')
+    ax.set_ylabel(r'Kąt $\theta$ $[^\circ]$')
     ax.grid(True, alpha=0.3)
     ax.set_yticks(np.arange(0, 361, 45))
     ax.axhline(0, color='white', linewidth=0.8, linestyle='--', alpha=0.3)
@@ -178,7 +178,7 @@ def plot_2x2_analysis(p, q, theta_deg, d):
     ax.scatter(theta_deg[::step], d[::step], c=colors_scatter, s=20, alpha=0.7,
                zorder=2, edgecolors='white', linewidths=0.3)
 
-    ax.set_xlabel(r'Kąt $\theta$ [°]')
+    ax.set_xlabel(r'Kąt $\theta$ $[^\circ]$')
     ax.set_ylabel(r'Odległość $d$')
     ax.set_xlim(0, 360)
     ax.grid(True, alpha=0.3)
@@ -193,7 +193,7 @@ def plot_2x2_analysis(p, q, theta_deg, d):
     ax.scatter(unique_angles, probs, c=COLORS[1], s=50, alpha=0.8,
                edgecolors='white', linewidths=0.5)
 
-    ax.set_xlabel(r'Kąt $\theta$ [°]')
+    ax.set_xlabel(r'Kąt $\theta$ $[^\circ]$')
     ax.set_ylabel(r'Prawdopodobieństwo')
     ax.set_xlim(0, 360)
     ax.grid(True, alpha=0.3)

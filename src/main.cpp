@@ -9,10 +9,8 @@ int main(int argc, char* argv[])
 {
     std::string mode = "alpha_seq";  // Domyślny tryb
     
-    if (argc >= 2) {
+    if (argc < 2) {
         mode = argv[1];
-    } else {
-        std::cout << "Brak argumentu - uruchamiam domyślny tryb: " << mode << "\n\n";
     }
 
     try {
