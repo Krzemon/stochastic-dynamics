@@ -144,7 +144,7 @@ namespace translation_variables
 
         usize total = theta.size();
         usize start_idx = (n_last > 0 && total > n_last) ? (total - n_last) : 0;
-        usize count = total - start_idx;
+
 
         int s_int = static_cast<int>(s_value * 100);
         

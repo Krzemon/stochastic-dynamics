@@ -223,6 +223,44 @@ def plot_2x2_analysis(p, q, theta_deg, d):
 
 # ==================== Funkcje główne ====================
 
+def write_found_patterns(found, runs, s_value, plot_example):
+    s_int = int(s_value * 100)
+    os.makedirs(f"data/{s_int}", exist_ok=True)
+    filepath = f"data/{s_int}/found_patterns_s_{s_value:.2f}.txt"
+
+    alfa_structures = {
+        'alfa_1': '[6, 6, 7, 6, 6, 6, 7]',
+        'alfa_2': '[6, 6, 6, 7, 6, 6, 7]',
+        'alfa_3': '[6, 6, 6, 7, 6, 6, 6, 7]',
+    }
+
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(f"Analiza wzorców alfa dla s = {s_value:.2f}\n")
+        f.write("=" * 50 + "\n\n")
+
+        f.write("Struktury wzorców:\n")
+        for name, struct in alfa_structures.items():
+            f.write(f"  {name}: {struct}\n")
+        f.write("\n")
+
+        for name, occurrences in found.items():
+            f.write("=" * 50 + "\n")
+            f.write(f"{name}: {len(occurrences)} wystąpień\n")
+            f.write("=" * 50 + "\n")
+            for run_start, run_end, angle_start, angle_end in occurrences:
+                f.write(f"  run {run_start:5d}-{run_end:5d}  |  "
+                        f"indeks kąta {angle_start:6d}-{angle_end:6d}\n")
+            f.write("\n")
+
+        f.write("=" * 50 + "\n")
+        f.write("Wykres sekwencji wykonany dla:\n")
+        for name, (run_start, run_end, angle_start, angle_end) in plot_example.items():
+            f.write(f"  {name}: run {run_start}-{run_end}  |  "
+                    f"indeks kąta {angle_start}-{angle_end}\n")
+
+    print(f"Zapisano: {filepath}")
+
+
 def search_single_patterns(s_value):
     s_int = int(s_value * 100)
 
@@ -237,6 +275,22 @@ def search_single_patterns(s_value):
             print(f"{name}: {len(occurrences)} wystąpień")
 
     os.makedirs(f"plots/{s_int}", exist_ok=True)
+
+    plot_example = {}
+    for name, pattern in zip(alfa_names, ALFA_PATTERNS):
+        occurrences = found[name]
+        if occurrences:
+            mid = occurrences[len(occurrences) // 2]
+            run_start, run_end, angle_start, angle_end = mid
+            block_len = angle_end - angle_start
+            fig = plot_single_block(theta_deg, runs, name, run_start, block_len)
+            filename = f"plots/{s_int}/block_{name}_{s_int}.png"
+            fig.savefig(filename, dpi=300, bbox_inches='tight')
+            plt.close(fig)
+            print(f"Zapisano: {filename}")
+            plot_example[name] = mid
+
+    write_found_patterns(found, runs, s_value, plot_example)
 
     fig_analysis = plot_2x2_analysis(p, q, theta_deg, d)
     fig_analysis.suptitle(f'Analiza dla $s = {s_value:.2f}$', y=0.995)
