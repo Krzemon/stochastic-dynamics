@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
         else if (mode == "analiza")
             translation_variables::run_calculation(argc, argv);
         else if (mode == "alpha_seq")
-            translation_variables::write_trajectory_data("data_out/C_good_data/y_266_11_od_0_83.90000.out");
+            translation_variables::write_trajectory_data("data_out/C_good_data/y_266_11_od_0_78.89000.out");
         else {
             std::cerr << "Nieznany tryb: " << mode << "\n\n" << "Dostepne tryby:\n"
                 << "  obliczenie\n" << "  analiza\n" << "  alpha_seq (domyślny)\n";

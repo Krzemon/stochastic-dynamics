@@ -9,9 +9,9 @@ namespace translation_variables
     double calc_K(const std::vector<double>& phi);
 
     void make_PQ(const std::vector<double>& phi, 
-                 std::vector<double>& p,
-                 std::vector<double>& q,    
-                 double c, usize N);
+                       std::vector<double>& p,
+                       std::vector<double>& q,    
+                    double c, usize N);
 
     auto make_angle_distance(const std::vector<double>& phi, double c = 1.0) 
         -> std::pair<std::vector<double>, std::vector<double>>;

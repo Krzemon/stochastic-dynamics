@@ -34,10 +34,8 @@ BETA_PATTERNS = [
 ]
 
 
-def load_data(s_value):
-    s_int = int(s_value * 100)
-    filename = f"data/{s_int}/alpha_seq_s_{s_value:.2f}.dat"
-    data = np.loadtxt(filename)
+def load_data(filepath):
+    data = np.loadtxt(filepath)
 
     p = data[:, 0]
     q = data[:, 1]
@@ -47,6 +45,13 @@ def load_data(s_value):
     theta_deg = np.degrees(theta) % 360
 
     return p, q, theta_deg, d
+
+
+def s_value_from_path(filepath):
+    basename = os.path.basename(filepath)
+    # Format: alpha_seq_s_78.89.dat
+    s_str = basename.replace('alpha_seq_s_', '').replace('.dat', '')
+    return float(s_str)
 
 
 def identify_runs(theta_deg):
@@ -98,7 +103,7 @@ def find_single_patterns(runs, patterns, pattern_names):
 
 # ==================== Wykresy ====================
 
-def plot_single_block(theta_deg, runs, block_name, block_run_idx, block_len, context_angles=10):
+def plot_single_block(theta_deg, runs, block_name, block_run_idx, block_len, pattern, context_angles=10):
     angle_start = convert_run_to_angle_index(runs, block_run_idx)
     angle_end = angle_start + block_len
 
@@ -127,13 +132,13 @@ def plot_single_block(theta_deg, runs, block_name, block_run_idx, block_len, con
     ax.set_xlim(plot_start - 1, plot_end + 1)
     ax.set_ylim(-10, 370)
     ax.set_xlabel(r'Indeks kąta')
-    ax.set_ylabel(r'Kąt $\theta$ $[^\circ]$')
+    ax.set_ylabel(r'Kąt $\theta$ [°]')
     ax.grid(True, alpha=0.3)
     ax.set_yticks(np.arange(0, 361, 45))
     ax.axhline(0, color='white', linewidth=0.8, linestyle='--', alpha=0.3)
     ax.axhline(360, color='white', linewidth=0.8, linestyle='--', alpha=0.3)
 
-    ax.set_title(f'Blok {block_name}')
+    ax.set_title(f'$\\alpha_{{{block_name[-1]}}}$:  {pattern}')
 
     fig.tight_layout()
     return fig
@@ -226,7 +231,7 @@ def plot_2x2_analysis(p, q, theta_deg, d):
 def write_found_patterns(found, runs, s_value, plot_example):
     s_int = int(s_value * 100)
     os.makedirs(f"data/{s_int}", exist_ok=True)
-    filepath = f"data/{s_int}/found_patterns_s_{s_value:.2f}.txt"
+    filepath = f"data/{s_int}/found_patterns_s_{s_value:.5f}.txt"
 
     alfa_structures = {
         'alfa_1': '[6, 6, 7, 6, 6, 6, 7]',
@@ -234,7 +239,7 @@ def write_found_patterns(found, runs, s_value, plot_example):
         'alfa_3': '[6, 6, 6, 7, 6, 6, 6, 7]',
     }
 
-    with open(filepath, 'w', encoding='utf-8') as f:
+    with open(filepath, 'w') as f:
         f.write(f"Analiza wzorców alfa dla s = {s_value:.2f}\n")
         f.write("=" * 50 + "\n\n")
 
@@ -261,10 +266,11 @@ def write_found_patterns(found, runs, s_value, plot_example):
     print(f"Zapisano: {filepath}")
 
 
-def search_single_patterns(s_value):
-    s_int = int(s_value * 100)
+def search_single_patterns(filepath):
+    s_value = s_value_from_path(filepath)
+    s_int = round(s_value * 100)
 
-    p, q, theta_deg, d = load_data(s_value)
+    p, q, theta_deg, d = load_data(filepath)
     runs = identify_runs(theta_deg)
 
     alfa_names = ['alfa_1', 'alfa_2', 'alfa_3']
@@ -283,8 +289,8 @@ def search_single_patterns(s_value):
             mid = occurrences[len(occurrences) // 2]
             run_start, run_end, angle_start, angle_end = mid
             block_len = angle_end - angle_start
-            fig = plot_single_block(theta_deg, runs, name, run_start, block_len)
-            filename = f"plots/{s_int}/block_{name}_{s_int}.png"
+            fig = plot_single_block(theta_deg, runs, name, run_start, block_len, pattern)
+            filename = f"plots/{s_int}/block_{name}_{s_value:.5f}.png"
             fig.savefig(filename, dpi=300, bbox_inches='tight')
             plt.close(fig)
             print(f"Zapisano: {filename}")
@@ -294,15 +300,14 @@ def search_single_patterns(s_value):
 
     fig_analysis = plot_2x2_analysis(p, q, theta_deg, d)
     fig_analysis.suptitle(f'Analiza dla $s = {s_value:.2f}$', y=0.995)
-    filename_analysis = f"plots/{s_int}/PQ_analysis_{s_int}.png"
+    filename_analysis = f"plots/{s_int}/PQ_analysis_{s_value:.5f}.png"
     fig_analysis.savefig(filename_analysis, dpi=300, bbox_inches='tight')
     plt.close(fig_analysis)
     print(f"Zapisano: {filename_analysis}")
 
 
 def main():
-    s_value = 83.90
-    search_single_patterns(s_value)
+    search_single_patterns("data/7889/alpha_seq_s_78.89.dat")
 
 
 if __name__ == '__main__':

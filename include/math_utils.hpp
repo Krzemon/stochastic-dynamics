@@ -34,8 +34,13 @@ namespace math_utils
     double median(std::vector<double> v);
 
     /**
-     * @brief Oblicza kąt w radianach z dokłądnością do ćwiartki
+     * @brief Oblicza kąt w radianach [0, 2*pi) z dokłądnością do ćwiartki
      */
     double angle(double y, double x);
+
+    /**
+     * @brief Oblicza kąt w stopniach [0, 360) z dokłądnością do ćwiartki
+     */
+    double angle_deg(double y, double x);
 
 }
