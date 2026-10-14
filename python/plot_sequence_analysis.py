@@ -34,8 +34,6 @@ BETA_PATTERNS = [
 ]
 
 
-# ==================== Wczytywanie danych ====================
-
 def load_data(s_value):
     s_int = int(s_value * 100)
     filename = f"data/{s_int}/alpha_seq_s_{s_value:.2f}.dat"
@@ -52,8 +50,6 @@ def load_data(s_value):
     
     return p, q, theta_deg, d
 
-
-# ==================== Analiza runs ====================
 
 def identify_runs(theta_deg):
     runs = []
@@ -82,8 +78,6 @@ def convert_run_to_angle_index(runs, run_index):
     return angle_idx
 
 
-# ==================== Szukanie sekwencji ====================
-
 def find_sequences(runs, patterns, counts):
     """
     Szuka złożonych sekwencji składających się z wielu bloków.
@@ -91,10 +85,9 @@ def find_sequences(runs, patterns, counts):
     Przykład: szuka (alfa_1 x 8) + (alfa_2 x 7) + (alfa_3 x 1)
     gdzie każdy blok musi wystąpić dokładnie counts[i] razy.
     
-    Args:
-        runs: lista długości runs
-        patterns: lista wzorców bloków
-        counts: lista liczności każdego bloku
+    runs: lista długości runs
+    patterns: lista wzorców bloków
+    counts: lista liczności każdego bloku
     """
     sequences = []
     i = 0
@@ -163,8 +156,6 @@ def find_single_patterns(runs, patterns, pattern_names):
     return found
 
 
-# ==================== Wydruk ====================
-
 def print_sequences(runs, sequences, patterns, counts, block_names, to_file=None):
     output = []
     
@@ -219,9 +210,9 @@ def print_single_patterns(found, to_file=None):
     text = "\n".join(output)
     print(text)
     
-    if to_file:
-        with open(to_file, 'a', encoding='utf-8') as f:
-            f.write(text)
+    # if to_file:
+    #     with open(to_file, 'a', encoding='utf-8') as f:
+    #         f.write(text)
 
 
 # ==================== Wykresy ====================
@@ -404,8 +395,8 @@ def search_single_patterns(s_value):
     """
     Szuka pojedynczych wystąpień wszystkich wzorców alfa i beta.
     """
+
     print(f"\nSzukanie pojedynczych wzorców dla s = {s_value:.2f}")
-    
     s_int = int(s_value * 100)
     
     p, q, theta_deg, d = load_data(s_value)
@@ -417,23 +408,17 @@ def search_single_patterns(s_value):
     
     found = find_single_patterns(runs, all_patterns, all_names)
     
-    os.makedirs(f"data/{s_int}", exist_ok=True)
-    output_file = f"data/{s_int}/single_patterns_s_{s_value:.2f}.txt"
+    os.makedirs(f"data/", exist_ok=True)
+    output_file = f"data/single_patterns_s_{s_value:.2f}.txt"
     
     print_single_patterns(found, output_file)
 
 
 def main():
-    print("\n  Wykonywanie analizy sekwencji...")
-    
-    # Podaj wartość s ręcznie (nie odczytujemy z nazwy pliku)
+
     s_value = 83.90
-    
-    # Szukaj pojedynczych wzorców alfa i beta
     search_single_patterns(s_value)
     
-    print("\n  Analiza zakończona!")
-
 
 if __name__ == '__main__':
     main()
