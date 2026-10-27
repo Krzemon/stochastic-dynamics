@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 
 COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16']
 
-def get_spaced_colors(n, cmap_name='viridis'):
+def get_spaced_colors(n, cmap_name='viridis', min=0, max=1):
     cmap = plt.get_cmap(cmap_name)
-    return [plt.cm.colors.to_hex(cmap(i)) for i in np.linspace(0, 1, n)]
+    return [plt.cm.colors.to_hex(cmap(i)) for i in np.linspace(min, max, n)]
 
 # default / dark_background / seaborn-v0_8 / ggplot / bmh 
 plt.style.use('dark_background') # >print(plt.style.available)
@@ -36,9 +36,9 @@ plt.rcParams.update({
     "axes.labelsize": 18,
     "figure.titlesize": 24,
     "axes.titlesize": 18,
-    "xtick.labelsize": 14,
-    "ytick.labelsize": 14,
-    "legend.fontsize": 12,
+    "xtick.labelsize": 16,
+    "ytick.labelsize": 16,
+    "legend.fontsize": 13,
 
     # ===== Lines =====
     "axes.linewidth": 1.2,
@@ -53,7 +53,7 @@ plt.rcParams.update({
     "ytick.minor.width": 0.8,
 
     # ===== Figure =====
-    "figure.figsize": (12, 7),
+    "figure.figsize": (9, 6),
     "figure.dpi": 250,
 
     # ===== Save =====
@@ -92,6 +92,16 @@ def test_style():
     plt.savefig('wykres.png', dpi=300)
     plt.close()
     
+
+def save_me(filename, fig=None):
+    pathname = "plots/" + filename
+    if fig is None:
+        fig = plt.gcf()
+    fig.tight_layout()
+    fig.savefig(pathname)
+    plt.close(fig)
+    print(f"Zapisano: {pathname}")
+
 
 def test_binary_import():
 

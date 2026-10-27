@@ -9,7 +9,6 @@
 #include <sstream>
 #include <iostream>
 
-using usize = std::size_t;
 namespace fs = std::filesystem;
 
 const fs::path project_root = PROJECT_ROOT_DIR;
