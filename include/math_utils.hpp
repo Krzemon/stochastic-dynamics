@@ -36,7 +36,7 @@ namespace math_utils
     /**
      * @brief Oblicza kąt w radianach [0, 2*pi) z dokłądnością do ćwiartki
      */
-    double angle(double y, double x);
+    double angle_rad(double y, double x);
 
     /**
      * @brief Oblicza kąt w stopniach [0, 360) z dokłądnością do ćwiartki

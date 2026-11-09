@@ -258,3 +258,121 @@ read_binary(const std::string& filename)
 
     return columns;
 }
+
+
+/**
+ * @brief Wczytuje wielokolumnowy plik tekstowy
+ */
+inline std::vector<std::vector<double>> read_text_columns(
+    const std::string& filename,
+    size_t skip_rows = 0)
+{
+    std::ifstream f(filename);
+    if (!f)
+        throw std::runtime_error("Nie można otworzyć pliku: " + filename);
+
+    std::vector<std::vector<double>> cols;
+    std::string line;
+    size_t row = 0;
+
+    while (std::getline(f, line))
+    {
+        if (row++ < skip_rows) continue;
+
+        std::istringstream iss(line);
+        double v;
+        std::vector<double> vals;
+
+        while (iss >> v) vals.push_back(v);
+
+        if (vals.empty()) continue;
+
+        if (cols.empty()) cols.resize(vals.size());
+
+        for (size_t i = 0; i < vals.size(); ++i)
+            cols[i].push_back(vals[i]);
+    }
+
+    return cols;
+}
+
+
+/**
+ * @brief Konwertuje plik tekstowy .out na wiele plików binarnych (1 kolumna = 1 plik)
+ * 
+ * @param text_filepath Ścieżka do pliku tekstowego (np. "data_out/result.out")
+ * @param output_prefix Prefix dla plików wyjściowych (np. "data/phi_y")
+ *                      Wynik: phi_y0.bin, phi_y1.bin, phi_y2.bin, ...
+ * @param skip_rows Liczba wierszy nagłówka do pominięcia
+ */
+inline void convert_text_to_binary_columns(
+    const std::string& text_filepath,
+    const std::string& output_prefix,
+    size_t skip_rows = 0)
+{
+    auto cols = read_text_columns(text_filepath, skip_rows);
+
+    if (cols.empty())
+        throw std::runtime_error("Brak danych w pliku: " + text_filepath);
+
+    for (size_t i = 0; i < cols.size(); ++i)
+    {
+        std::string bin_filename = output_prefix + std::to_string(i) + ".bin";
+        write_binary_vector(bin_filename, cols[i]);
+    }
+
+    std::cout << "Konwersja: " << text_filepath << " -> " 
+              << cols.size() << " plików binarnych (" << output_prefix << "*.bin)\n";
+}
+
+
+/**
+ * @brief Konwertuje pliki binarne z powrotem na plik tekstowy .dat
+ * 
+ * @param bin_filepath_pattern Prefix plików binarnych (np. "data/phi_y")
+ * @param text_filepath Ścieżka do pliku wyjściowego (np. "data/output.dat")
+ * @param n_cols Liczba kolumn (plików binarnych)
+ */
+inline void convert_binary_to_text(
+    const std::string& bin_filepath_pattern,
+    const std::string& text_filepath,
+    size_t n_cols)
+{
+    std::vector<std::vector<double>> cols(n_cols);
+
+    for (size_t i = 0; i < n_cols; ++i)
+    {
+        std::string bin_filename = bin_filepath_pattern + std::to_string(i) + ".bin";
+        cols[i] = read_binary_vector(bin_filename);
+    }
+
+    if (cols.empty() || cols[0].empty())
+        throw std::runtime_error("Brak danych do konwersji");
+
+    const size_t n_rows = cols[0].size();
+    for (size_t i = 1; i < n_cols; ++i)
+    {
+        if (cols[i].size() != n_rows)
+            throw std::runtime_error("Kolumny mają różne rozmiary");
+    }
+
+    const fs::path filepath = project_root / text_filepath;
+    fs::create_directories(filepath.parent_path());
+
+    std::ofstream file(filepath);
+    if (!file)
+        throw std::runtime_error("Nie można otworzyć pliku: " + filepath.string());
+
+    for (size_t row = 0; row < n_rows; ++row)
+    {
+        for (size_t col = 0; col < n_cols; ++col)
+        {
+            if (col > 0) file << " ";
+            file << cols[col][row];
+        }
+        file << "\n";
+    }
+
+    std::cout << "Konwersja: " << n_cols << " plików binarnych (" 
+              << bin_filepath_pattern << "*.bin) -> " << text_filepath << "\n";
+}

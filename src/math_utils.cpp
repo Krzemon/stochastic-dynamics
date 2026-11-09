@@ -59,17 +59,33 @@ namespace math_utils
             return (v[n / 2 - 1] + v[n / 2]) / 2.0;
     }
 
-    double angle(double y, double x) 
+    // double angle_rad(double y, double x) 
+    // {
+    //     double a = std::atan2(y, x);
+    //     // if (a < 0) a += 2.0 * M_PI;
+    //     return a;
+    // }
+
+    // double angle_deg(double y, double x)
+    // {
+    //     double a = std::atan2(y, x) * 180.0 / M_PI;
+    //     // if (a < 0) a += 360.0;
+    //     return a;
+    // }
+
+    double angle_rad(double y, double x) 
     {
         double a = std::atan2(y, x);
-        // if (a < 0) a += 2.0 * M_PI;
+        if (a < 0) 
+            a += 2.0 * M_PI;
         return a;
     }
 
     double angle_deg(double y, double x)
     {
         double a = std::atan2(y, x) * 180.0 / M_PI;
-        // if (a < 0) a += 360.0;
+        if (a < 0) 
+            a += 360.0;
         return a;
     }
 
