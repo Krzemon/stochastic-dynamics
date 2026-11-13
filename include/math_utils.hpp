@@ -2,12 +2,13 @@
 
 #include <cmath>
 #include <vector>
+#include <random>
 
 namespace math_utils 
 {
 
     /**
-     * @brief Generuje wektor ze stałym krokiem w zadanym zakresie
+     * @brief Zwraca wektor liczb ze stałym krokiem <step> od <start> do <end> (wyłączając go)
      */
     template<typename T = int>
     std::vector<T> arange(T start, T end, T step=1)
@@ -17,30 +18,40 @@ namespace math_utils
             result.push_back(x);
         return result;   
     }
-
+    
     /**
-     * @brief Generuje wektor n wymiarowy ze stałą różnicą między elementami
+     * @brief Zwraca wektor <size> liczb od <start> do <end> włącznie
      */
     std::vector<double> linspace(double start, double end, size_t size);
 
     /**
-     * @brief Oblicza współczynnik korelacji Pearsona dla dwóch wektorów
+     * @brief Oblicza współczynnik korelacji Pearsona dwóch wektorów
      */
-    double calc_pearson(const std::vector<double>& x, const std::vector<double>& y);
+    double correlation(const std::vector<double>& x, const std::vector<double>& y);
 
     /**
-     * @brief Oblicza medianę wektora
+     * @brief Oblicza współczynnik kierunkowy prostej regresji liniowej MNK
+     */
+    double regression(const std::vector<double>& x, const std::vector<double>& y);
+    
+    /**
+     * @brief Oblicza medianę wektora
      */
     double median(std::vector<double> v);
-
+    
     /**
-     * @brief Oblicza kąt w radianach [0, 2*pi) z dokłądnością do ćwiartki
+     * @brief Oblicza kąt w radianach z zakresu [0, 2pi)
      */
     double angle_rad(double y, double x);
 
     /**
-     * @brief Oblicza kąt w stopniach [0, 360) z dokłądnością do ćwiartki
+     * @brief Oblicza kąt w stopniach z zakresu [0, 360)
      */
     double angle_deg(double y, double x);
+
+    /**
+     * @brief Generuje liczby z rozkładu jednostajnego
+     */
+    std::vector<double> uniform(size_t n, double min, double max);
 
 }

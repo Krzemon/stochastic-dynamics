@@ -7,71 +7,68 @@
 
 namespace math_utils 
 {
-
     std::vector<double> linspace(double start, double end, size_t size)
     {
         std::vector<double> result(size);
         double step = (end - start) / (size - 1); // size > 1
-
         for (size_t i=0; i<size; ++i)
             result[i] = start + i*step;
-
         return result;
     }
 
-
-    double calc_pearson(const std::vector<double>& x, const std::vector<double>& y) 
+    double correlation(const std::vector<double>& x, const std::vector<double>& y) 
     {
         if (x.size() != y.size())
             throw std::invalid_argument("Wektory muszą mieć tę samą długość.");
 
         size_t n = x.size();
-        double sum_x = 0.0, sum_y = 0.0;
-        double sum_xy = 0.0, sum_x2 = 0.0, sum_y2 = 0.0;
-
+        double sum_x=.0, sum_y=.0, sum_xy=.0, sum_x2=.0, sum_y2=.0;
         for (size_t i=0; i<n; ++i) 
         {
-            sum_x += x[i];
-            sum_y += y[i];
+            sum_x += x[i]; sum_y += y[i];
             sum_xy += x[i] * y[i];
             sum_x2 += x[i] * x[i];
             sum_y2 += y[i] * y[i];
         }
-
         double numerator = n*sum_xy - sum_x*sum_y;
         double denominator = std::sqrt((n*sum_x2 - sum_x*sum_x) * (n*sum_y2 - sum_y*sum_y));
-
-        if (std::abs(denominator) < 1e-12)
+        if (denominator < 1e-12)
             throw std::runtime_error("Dzielenie przez zero.");
-
         return numerator / denominator;
     }
 
+    double regression(const std::vector<double>& x, const std::vector<double>& y)
+    {
+        if (x.size() != y.size())
+            throw std::invalid_argument("Wektory muszą mieć tę samą długość.");
+        size_t n = x.size();
+        double mean_x = .0, mean_y = .0;
+        for (size_t i=0; i<n; ++i)
+        {
+            mean_x += x[i]; mean_y += y[i];
+        }
+        mean_x /= n; mean_y /= n;
+        double covariance = .0, variance = .0;
+        for (size_t i=0; i<n; ++i)
+        {
+            const double dx = x[i] - mean_x;
+            covariance += dx * (y[i] - mean_y);
+            variance += dx * dx;
+        }
+        if (variance < 1e-12)
+            throw std::invalid_argument("Dzielenie przez zero.");
+        return covariance / variance;
+    }
 
     double median(std::vector<double> v)
     {
         std::sort(v.begin(), v.end());
         size_t n = v.size();
-
         if (n % 2 == 1)
             return v[n / 2];
         else
             return (v[n / 2 - 1] + v[n / 2]) / 2.0;
     }
-
-    // double angle_rad(double y, double x) 
-    // {
-    //     double a = std::atan2(y, x);
-    //     // if (a < 0) a += 2.0 * M_PI;
-    //     return a;
-    // }
-
-    // double angle_deg(double y, double x)
-    // {
-    //     double a = std::atan2(y, x) * 180.0 / M_PI;
-    //     // if (a < 0) a += 360.0;
-    //     return a;
-    // }
 
     double angle_rad(double y, double x) 
     {
@@ -87,6 +84,19 @@ namespace math_utils
         if (a < 0) 
             a += 360.0;
         return a;
+    }
+
+    std::vector<double> uniform(size_t n, double min, double max)
+    {
+        std::random_device rd;
+        std::mt19937 generator(rd());
+        std::uniform_real_distribution<double> distribution(min, max);
+
+        std::vector<double> values(n);
+        for (double& x : values)
+            x = distribution(generator);
+
+        return values;
     }
 
 }

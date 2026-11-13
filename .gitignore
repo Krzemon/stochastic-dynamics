@@ -7,19 +7,11 @@ __pycache__/
 
 # C/C++
 *.o
-doubleVer
 build/
-extern_C/
 
 # Lokalne
+0=local/
+docs/
 
-0=demo/
-papers/
-
-data_out/
 data/
-
 plots/
-plots_out/
-
-rules.md

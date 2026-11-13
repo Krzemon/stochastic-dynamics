@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 
+// odpowiednik doubleVer.c -- niestosowany
 namespace double_ver 
 {
     constexpr int N = 5;

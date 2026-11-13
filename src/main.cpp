@@ -1,73 +1,59 @@
-#include "double_ver.hpp"
-#include "phase_space_analysis.hpp"
+#include "config.hpp"
+#include "math_utils.hpp"
+#include "phase_space.hpp"
 
 #include <iostream>
 #include <string>
-#include <vector>
+#include <stdexcept>
+
+const std::string article_path = "0=local/article_data/";
+const std::vector<std::string> article = {
+    "7889/y_266_11_od_0_7.88900.out",
+};
+
+
+// POLECONE
+const std::vector<std::string> files = {
+    "data/4750/y_266_11_od_0_4.75000.out", // punkt staly
+    "data/6000/y_266_11_od_0_6.00000.out", // quasiperiodyczne
+    "data/7500/y_266_11_od_0_7.50000.out", // periodyczne
+    "data/8390/y_266_11_od_0_8.39000.out", // chaos
+};
 
 int main(int argc, char* argv[])
 {
     #ifdef _OPENMP
-    std::cout << "[INFO] OpenMP: WŁĄCZONY\n";
+        std::cout << "[INFO] OpenMP: ON\n";
     #else
-    std::cout << "[INFO] OpenMP: WYŁĄCZONY\n";
+        std::cout << "[INFO] OpenMP: OFF\n";
     #endif
-    
+
     prepare_directories(false,false);
-    std::string mode = "PQ_DTheta_K";
+    const std::string mode = "PQ_DTheta_K";
 
+
+
+    std::cout << "mode: " << mode << '\n';
     try {
-        if (mode == "obliczenie") {
-            double_ver::run_calculation(argc, argv);
+        if (mode == "PQ_DTheta_K") 
+        {
+            auto file = article_path + article[0];
+            // for (const auto& file : files) {   
+                std::cout << "Przetwarzam: " << file << '\n';
+                const auto data = read_text_columns(file, N_SKIP);
+                phase_space::run(data, math_utils::correlation, false, 
+                        fs::path(file).parent_path().filename().string(), 
+                        std::vector<double>{1.0});
+            // }
         }
-        else if (mode == "K_vs_c") {
-            std::vector<std::string> filenames = {"4750/y_266_11_od_0_4.75000.out"};
-            
-            phase_space_analysis::run_K_vs_c(
-                filenames, DEFAULT_C_MIN, DEFAULT_C_MAX, 100000,
-                phase_space_analysis::calc_K_corr,
-                false, true, 42, 1.25, 2.0
-            );
+        else if (mode == "other")
+        {
+            ;;;;;;;;;;;;;;;;;;
+        }
+        else {;} 
 
-            phase_space_analysis::run_K_vs_c(
-                filenames, DEFAULT_C_MIN, DEFAULT_C_MAX, 100000,
-                phase_space_analysis::calc_K_reg,
-                false, true, 42, 1.25, 2.0
-            );
-        }
-        else if (mode == "K_vs_Nc") {
-            std::vector<std::string> filenames = {"4750/y_266_11_od_0_4.75000.out"};
-            std::vector<size_t> custom_nc_list = {70, 80, 90, 100, 110, 120, 130};
-
-            phase_space_analysis::run_K_vs_Nc(
-                filenames, DEFAULT_C_MIN, DEFAULT_C_MAX, custom_nc_list, 100000,
-                phase_space_analysis::calc_K_corr, false, true, 42, 1.25, 2.0
-            );
-
-            phase_space_analysis::run_K_vs_Nc(
-                filenames, DEFAULT_C_MIN, DEFAULT_C_MAX, custom_nc_list, 100000,
-                phase_space_analysis::calc_K_reg, false, true, 42, 1.25, 2.0
-            );
-        }
-        else if (mode == "PQ_DTheta_K") {
-            std::vector<std::string> filenames = {"4750/y_266_11_od_0_4.75000.out"};
-
-            phase_space_analysis::run_PQ_DTheta_analysis(
-                filenames, DEFAULT_C_MIN, DEFAULT_C_MAX, 100000, 7000, 0, false, 1.25, 2.0, 42
-            );
-        }
-        else {
-            std::cerr << "Nieznany tryb: " << mode << "\n\n"
-                      << "Dostepne tryby:\n"
-                      << "  obliczenie\n"
-                      << "  K_vs_c\n"
-                      << "  K_vs_Nc\n"
-                      << "  PQ_DTheta_K\n";
-            return 1;
-        }
-    }
-    catch (const std::exception& e) {
-        std::cerr << "Blad: " << e.what() << '\n';
+    } catch (const std::exception& e) {
+        std::cerr << "Błąd: " << e.what() << '\n';
         return 1;
     }
 
