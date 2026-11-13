@@ -1,18 +1,20 @@
+from fileinput import filename
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
-from config import COLORS, plt
+from config import COLORS, save_me
 
-CASES = ["4750", "6000", "7500", "8390"]
 N_COLS = 5
 WINDOW = 50
 STEP = 50
 DATA_DIR = "data"
 PLOTS_DIR = "plots"
-SHOW_CENTERS = True
+SHOW_CENTERS = False
 
 
 def load_meta(filepath):
+
     with open(filepath) as f:
         line = f.readline().strip().lstrip("# ")
     items = line.replace("=", " ").split()
@@ -58,9 +60,51 @@ def plot_pq_trajectory(ax, p, q, title=""):
     ax.set_title(title)
 
 
-def main():
-    # for case in CASES:
-    for case in ["7889"]:
+def plot_true():
+    names = [
+        "y_266_11_od_0_4.75000_7500_pg_y1.dat",
+        "y_266_11_od_0_6.00000_7500_pg_y1.dat",
+        "y_266_11_od_0_7.50000_7500_pg_y1.dat",
+        "y_266_11_od_0_8.39000_7500_pg_y1.dat"]
+    
+    for name in names:
+        case = f"{float(name.split('_od_')[1].removeprefix('0_').split('_')[0]):.4f}"
+        filepath = os.path.join("0=local", "dane_promotor", name)
+        data = np.loadtxt(filepath, comments="#")
+        p, q = data[:, 0], data[:, 1]
+        fig, ax = plt.subplots(figsize=(9, 9))
+        plot_pq_trajectory(ax, p, q, title=rf"$s = {case}\ \  \varphi=y_1$")
+        os.makedirs(f"{PLOTS_DIR}/pq_promotor", exist_ok=True)
+        filename = f"pq_promotor/pq_{case}.png"
+        save_me(filename)
+
+
+def plot_og_test4():
+    dirs = [
+        "0=local/out_test01",
+        "0=local/out_test01_new",
+        "0=local/out_test01_moje",
+        "0=local/out_test01_new_moje",
+    ]
+
+    for d in dirs:
+        filepath = os.path.join(d, "pq.dat")
+        p, q = load_data(filepath)
+        c, kc = load_meta(filepath)
+        title = fr'$c={c:.6f}$,\quad $K_c={kc:.6f}$'
+        fig, ax = plt.subplots(figsize=(9, 9))
+        plot_pq_trajectory(ax, p, q, title=title)
+        fig.tight_layout()
+        filename = os.path.join(d, "pq_plot.png")
+        fig.savefig(filename, dpi=300, bbox_inches='tight')
+        plt.close(fig)
+        print(f"Zapisano: {filename}")
+
+
+def plot_cases():
+    CASES = ["4750", "6000", "7500", "8390"]
+    for case in CASES:
+    # for case in ["7889"]:
         for j in range(1, N_COLS + 1):
             filepath = os.path.join(DATA_DIR, case, f"pq_col_{j}.dat")
             p, q = load_data(filepath)
@@ -76,6 +120,11 @@ def main():
             fig.savefig(filename, dpi=300, bbox_inches='tight')
             plt.close(fig)
             print(f"Zapisano: {filename}")
+
+def main(): 
+    plot_cases()        # MAIN
+    # plot_true()       # done 
+    # plot_og_test4()   # done 
 
 
 if __name__ == '__main__':
