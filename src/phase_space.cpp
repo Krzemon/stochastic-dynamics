@@ -39,6 +39,20 @@ namespace phase_space {
         }
     }
 
+    void calc_pq_v2(const vec& phi, double c, vec& p, vec& q)
+    {
+        size_t n = phi.size();
+        p.resize(n);
+        q.resize(n);
+        p[0] = phi[0] * std::cos(c);
+        q[0] = phi[0] * std::sin(c);
+        for (size_t i = 1; i < n; ++i)
+        {
+            p[i] = p[i-1] + phi[i-1] * std::cos(c * i);
+            q[i] = q[i-1] + phi[i-1] * std::sin(c * i);
+        }
+    }
+
     vec calc_Mn(
         const vec& phi,
         const vec& p,
@@ -95,7 +109,8 @@ namespace phase_space {
         size_t n_cut, const KMethod& k_method)
     {
         vec p, q;
-        calc_pq(phi, c, p, q);
+        // calc_pq(phi, c, p, q);
+        calc_pq_v2(phi, c, p, q);
         vec d_values = calc_Dn(phi, p, q, c, n_cut);
         vec n_values = math_utils::arange<double>(1, n_cut + 1, 1);
         return k_method(n_values, d_values);
@@ -128,7 +143,8 @@ namespace phase_space {
                 best = i;
 
         vec p, q;
-        calc_pq(phi, c_values[best], p, q);
+        // calc_pq(phi, c_values[best], p, q);
+        calc_pq_v2(phi, c_values[best], p, q);
 
         auto f = prepare_data_file(
             out_dir + "/pq_col_" + std::to_string(col + 1) + ".dat", "data");

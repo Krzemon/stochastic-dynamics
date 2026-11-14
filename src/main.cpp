@@ -2,6 +2,7 @@
 #include "math_utils.hpp"
 #include "phase_space.hpp"
 
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <stdexcept>
@@ -30,25 +31,40 @@ int main(int argc, char* argv[])
 
     prepare_directories(false,false);
     const std::string mode = "PQ_DTheta_K";
-
+    // const std::string mode = "PQ_fixed_c";
 
 
     std::cout << "mode: " << mode << '\n';
     try {
         if (mode == "PQ_DTheta_K") 
         {
-            auto file = article_path + article[0];
+            auto file = "data/4750/y_266_11_od_0_4.75000.out";
+            // auto file = article_path + article[0];
             // for (const auto& file : files) {   
                 std::cout << "Przetwarzam: " << file << '\n';
                 const auto data = read_text_columns(file, N_SKIP);
                 phase_space::run(data, math_utils::correlation, false, 
-                        fs::path(file).parent_path().filename().string(), 
+                        fs::path(file).parent_path().filename().string(), //); 
                         std::vector<double>{1.0});
             // }
         }
-        else if (mode == "other")
+        else if (mode == "PQ_fixed_c")
         {
-            ;;;;;;;;;;;;;;;;;;
+            // taki sam seed losowania, ale zapisalem je wcześniej 
+            std::ifstream fc("data/c_values.dat");
+            if (!fc) 
+                throw std::runtime_error("Nie mozna otworzyc data/c_values.dat");
+            std::vector<double> c_fixed;
+            double val;
+            while (fc >> val) c_fixed.push_back(val);
+
+            for (const auto& file : files) {
+                std::cout << "Przetwarzam: " << file << '\n';
+                const auto data = read_text_columns(file, N_SKIP);
+                phase_space::run(data, math_utils::correlation, false,
+                        fs::path(file).parent_path().filename().string(),
+                        c_fixed);
+            }
         }
         else {;} 
 

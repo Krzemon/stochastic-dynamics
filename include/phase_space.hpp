@@ -29,6 +29,16 @@ namespace phase_space {
      * @brief Oblicza p i q na podstawie szeregu
      */
     void calc_pq(
+        const vec& phi, 
+        double c, 
+        vec& p, 
+        vec& q
+    );
+
+    /**
+     * @brief Oblicza p i q - wersja z opóźnieniem (phi[i-1] * cos(c*i))
+     */
+    void calc_pq_v2(
         const vec& phi,
         double c,
         vec& p,

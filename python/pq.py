@@ -102,9 +102,9 @@ def plot_og_test4():
 
 
 def plot_cases():
-    CASES = ["4750", "6000", "7500", "8390"]
-    for case in CASES:
-    # for case in ["7889"]:
+    # CASES = ["4750", "6000", "7500", "8390"]
+    # for case in CASES:
+    for case in ["4750"]:
         for j in range(1, N_COLS + 1):
             filepath = os.path.join(DATA_DIR, case, f"pq_col_{j}.dat")
             p, q = load_data(filepath)
@@ -123,6 +123,7 @@ def plot_cases():
 
 def main(): 
     plot_cases()        # MAIN
+
     # plot_true()       # done 
     # plot_og_test4()   # done 
 
