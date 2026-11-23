@@ -86,10 +86,16 @@ namespace math_utils
         return a;
     }
 
-    std::vector<double> uniform(size_t n, double min, double max)
+    std::vector<double> uniform(size_t n, double min, double max, std::optional<unsigned int> seed)
     {
-        std::random_device rd;
-        std::mt19937 generator(rd());
+        std::mt19937 generator;
+        if (seed.has_value()) {
+            generator.seed(seed.value());
+        } else {
+            std::random_device rd;
+            generator.seed(rd());
+        }
+        
         std::uniform_real_distribution<double> distribution(min, max);
 
         std::vector<double> values(n);

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <vector>
 #include <random>
+#include <optional>
 
 namespace math_utils 
 {
@@ -50,8 +51,8 @@ namespace math_utils
     double angle_deg(double y, double x);
 
     /**
-     * @brief Generuje liczby z rozkładu jednostajnego
+     * @brief Generuje liczby z rozkładu jednostajnego (opcjonalnie z ustalonym seed)
      */
-    std::vector<double> uniform(size_t n, double min, double max);
+    std::vector<double> uniform(size_t n, double min, double max, std::optional<unsigned int> seed = std::nullopt);
 
 }

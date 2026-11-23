@@ -12,6 +12,7 @@ build/
 # Lokalne
 0=local/
 docs/
-
 data/
 plots/
+
+TODO.txt

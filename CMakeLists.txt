@@ -25,7 +25,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
 
 find_package(OpenMP REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE gsl gslcblas m OpenMP::OpenMP_CXX) # _OPENMP = ON
-    # target_link_libraries(${PROJECT_NAME} PRIVATE gsl gslcblas m)              # _OPENMP = OFF
+# target_link_libraries(${PROJECT_NAME} PRIVATE gsl gslcblas m)              # _OPENMP = OFF
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE PROJECT_ROOT_DIR="${PROJECT_SOURCE_DIR}")
 
