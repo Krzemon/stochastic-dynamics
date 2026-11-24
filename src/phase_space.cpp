@@ -142,7 +142,7 @@ namespace phase_space {
             ? ("K_vs_c_col_" + std::to_string(col + 1) + ".dat")
             : ("K_vs_c_col_" + std::to_string(col + 1) + suffix + ".dat");
         
-        auto f = prepare_data_file(full_dir + "/" + filename, "data");
+        auto f = prepare_data_file(full_dir + "/" + filename);
         f << "# c\tK\n";
         for (size_t i = 0; i < c_values.size(); ++i)
             f << c_values[i] << '\t' << k_values[i] << '\n';
@@ -178,8 +178,7 @@ namespace phase_space {
         }
         {
             auto [theta, d] = make_angle_distance(phi, p, q);
-            auto f = prepare_data_file(
-                full_dir + "/angle_distance_col_" + std::to_string(col + 1) + ".dat");
+            auto f = prepare_data_file(full_dir + "/angle_distance_col_" + std::to_string(col + 1) + ".dat");
             f << std::fixed << std::setprecision(10);
             f << "# c=" << c_best << " K_c=" << k_best << " K=" << median_k << '\n';
             f << "# theta(n) d(n)\n";
@@ -305,8 +304,7 @@ namespace phase_space {
         // Zapisujemy podsumowanie: Nc vs mediana K (jeśli więcej niż 1 Nc)
         if (nc_list.size() > 1) {
             std::string full_dir = out_dir + "/" + subdir;
-            auto f = prepare_data_file(
-                full_dir + "/K_vs_Nc_col_" + std::to_string(col + 1) + ".dat");
+            auto f = prepare_data_file(full_dir + "/K_vs_Nc_col_" + std::to_string(col + 1) + ".dat");
             f << "# Nc\tK_median\n";
             for (size_t i = 0; i < nc_values.size(); ++i)
                 f << static_cast<size_t>(nc_values[i]) << '\t' << median_k_values[i] << '\n';

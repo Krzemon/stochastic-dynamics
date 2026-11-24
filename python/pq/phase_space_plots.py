@@ -6,7 +6,10 @@ from config.style import COLORS, plt, save_me
 CASES = ["4750", "6000", "7500", "8390"]
 N_COLS = 5
 DATA_DIR = "data"
+UNIT = "rad" # "rad" lub "deg"
 
+#wyłączenie offsetu  
+#ax.ticklabel_format(axis='y', style='sci', scilimits=(-3, 4), useOffset=False) albo ax.ticklabel_format(style='plain', useOffset=False)
 
 def load_meta(filepath):
     with open(filepath) as f:
@@ -21,9 +24,14 @@ def load_pq(filepath):
     return data[:, 0], data[:, 1]
 
 
-def load_angle_distance(filepath):
+def load_angle_distance(filepath, unit=UNIT):
     data = np.loadtxt(filepath, comments="#")
-    theta_deg = np.degrees(data[:, 0]) % 360
+    if unit == "rad":
+        theta_deg = np.degrees(data[:, 0]) % 360.0
+    elif unit == "deg":
+        theta_deg = data[:, 0] % 360.0
+    else:
+        raise ValueError("UNIT musi być równe 'rad' lub 'deg'")
     d = data[:, 1]
     return theta_deg, d
 
@@ -70,8 +78,12 @@ def plot_dist_vs_angle(ax, theta_deg, d, title=""):
 
 
 def plot_angle_dist(ax, theta_deg, title=""):
-    unique, counts = np.unique(np.round(theta_deg, 1), return_counts=True)
-    ax.scatter(unique, counts / len(theta_deg), c=COLORS[1], s=20, alpha=0.8,
+    angles = np.asarray(theta_deg, dtype=float) % 360.0
+    counts, edges = np.histogram(angles, bins=np.arange(0, 361, 1))
+    centers = edges[:-1] + 0.5
+    probs = counts / len(angles) if len(angles) > 0 else counts
+
+    ax.scatter(centers, probs, c=COLORS[1], s=20, alpha=0.8,
                edgecolors='white', linewidths=0.3)
     ax.set_xlabel(r'Kąt $\theta$ $[^\circ]$')
     ax.set_ylabel(r'Prawdopodobieństwo')
@@ -83,10 +95,9 @@ def plot_angle_dist(ax, theta_deg, title=""):
 
 def plot_distance_dist(ax, d, title=""):
     unique, counts = np.unique(np.round(d, 3), return_counts=True)
-    mean_d, std_d = np.mean(d), np.std(d)
+    # mean_d, std_d = np.mean(d), np.std(d)
     ax.scatter(unique, counts / len(d), c=COLORS[2], s=20, alpha=0.8,
-               edgecolors='white', linewidths=0.3,
-               label=rf'$\langle d \rangle = {mean_d:.3f} \pm {std_d:.3f}$')
+               edgecolors='white', linewidths=0.3) #label=rf'$\langle d \rangle = {mean_d:.3f} \pm {std_d:.3f}$')
     ax.set_xlabel(r'Odległość $d$')
     ax.set_ylabel(r'Prawdopodobieństwo')
     ax.grid(True, alpha=0.3)
@@ -111,7 +122,7 @@ def make_pq_plot(case, col):
 def make_dist_vs_angle_plot(case, col):
     filepath = os.path.join(DATA_DIR, case, mode_dir_name, f"angle_distance_col_{col}.dat")
     c, kc, k = load_meta(filepath)
-    theta_deg, d = load_angle_distance(filepath)
+    theta_deg, d = load_angle_distance(filepath,)
     fig, ax = plt.subplots(figsize=(9, 6))
     plot_dist_vs_angle(ax, theta_deg, d, title=_meta_title(case, col, c, kc, k))
     fig.tight_layout()

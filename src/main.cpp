@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
 
 
     // const std::string mode = "PQ_K";
-    const std::string mode = "PQ_DTheta";
-    // const std::string mode = "PQ_DTheta_fixed_c";
+    // const std::string mode = "PQ_DTheta";
+    const std::string mode = "PQ_DTheta_fixed_c";
     
     // const std::string mode = "K_vs_Nc";
     // const std::string mode = "K_reg";
@@ -40,17 +40,18 @@ int main(int argc, char* argv[])
     try {
         if (mode == "PQ_K") 
         {
-            for (const auto& file : files) {   
-                std::cout << "Przetwarzam: " << file << '\n';
-                const auto data = read_text_columns((data_in_dir / file).string(), N_SKIP);
-                const auto out_dir = fs::path(file).parent_path().string();
-                for (size_t col = 0; col < data.size(); ++col) {
-                    std::cout << col + 1 << " ";
-                    phase_space::run_pq(data[col], math_utils::correlation, true /*center*/, 
-                                        out_dir, col, std::vector<double>{1.0} /*c value*/);
-                }
-                std::cout << std::endl;
-            }
+            ;
+            // for (const auto& file : files) {   
+            //     std::cout << "Przetwarzam: " << file << '\n';
+            //     const auto data = read_text_columns((data_in_dir / file).string(), N_SKIP);
+            //     const auto out_dir = fs::path(file).parent_path().string();
+            //     for (size_t col = 0; col < data.size(); ++col) {
+            //         std::cout << col + 1 << " ";
+            //         phase_space::run_pq(data[col], math_utils::correlation, true /*center*/, 
+            //                             out_dir, col, std::vector<double>{1.0} /*c value*/);
+            //     }
+            //     std::cout << std::endl;
+            // }
         }
         else if (mode == "PQ_DTheta")
         {
@@ -99,36 +100,36 @@ int main(int argc, char* argv[])
                 vec k_values(c_values.size());
                 for (size_t i = 0; i < c_values.size(); ++i)
                     k_values[i] = phase_space::calc_k(phi, c_values[i], n_cut, math_utils::regression);
-                auto f = prepare_data_file(out_dir + "/K_reg/K_reg_col_" + std::to_string(col + 1) + ".dat", "data");
+                auto f = prepare_data_file(out_dir + "/K_reg/K_reg_col_" + std::to_string(col + 1) + ".dat");
                 f << "# c\tK\n";
                 for (size_t i = 0; i < c_values.size(); ++i)
                     f << c_values[i] << '\t' << k_values[i] << '\n';
             }
             std::cout << std::endl;
         }
-        // else if (mode == "PQ_DTheta_fixed_c")
-        // {
-        //     std::ifstream fc(data_in_dir / "c_values.dat");
-        //     if (!fc) 
-        //         throw std::runtime_error("Nie mozna otworzyc data/c_values.dat");
-        //     std::vector<double> c_fixed;
-        //     double val;
-        //     while (fc >> val) 
-        //         c_fixed.push_back(val);
+        else if (mode == "PQ_DTheta_fixed_c")
+        {
+            std::ifstream fc(data_in_dir / "c_values.dat");
+            if (!fc) 
+                throw std::runtime_error("Nie mozna otworzyc data/c_values.dat");
+            std::vector<double> c_fixed;
+            double val;
+            while (fc >> val) 
+                c_fixed.push_back(val);
 
-        //     // ---------------------------------
-        //     for (const auto& file : files) {
-        //         std::cout << "Przetwarzam: " << file << '\n';
-        //         const auto data = read_text_columns((data_in_dir / file).string(), N_SKIP);
-        //         const auto out_dir = fs::path(file).parent_path().string();
-        //         for (size_t col = 0; col < data.size(); ++col) {
-        //             std::cout << col + 1 << " ";
-        //             phase_space::run_pq_dtheta(data[col], math_utils::correlation, true, out_dir, col, c_fixed);
-        //         }
-        //         std::cout << std::endl;
-        //     }
+            // ---------------------------------
+            for (const auto& file : files) {
+                std::cout << "Przetwarzam: " << file << '\n';
+                const auto data = read_text_columns((data_in_dir / file).string(), N_SKIP);
+                const auto out_dir = fs::path(file).parent_path().string();
+                for (size_t col = 0; col < data.size(); ++col) {
+                    std::cout << col + 1 << " ";
+                    phase_space::run_pq_dtheta(data[col], math_utils::correlation, true, out_dir, col, c_fixed);
+                }
+                std::cout << std::endl;
+            }
 
-        // }
+        }
         else {;} 
 
     } catch (const std::exception& e) {
